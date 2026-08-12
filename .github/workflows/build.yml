@@ -1,0 +1,28 @@
+name: Build ESP32‑S3 Firmware
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Arduino‑CLI
+        uses: arduino/setup‑arduino‑cli@v2
+
+      - name: Add ESP32 board url
+        run: |
+          arduino‑cli config add board_manager.additional_urls https://dl.espressif.com/dl/package_esp32_index.json
+          arduino‑cli core update‑index
+
+      - name: Install esp32 core
+        run: arduino‑cli core install esp32:esp32
+
+      - name: Compile sketch
+        run: arduino‑cli compile --fqbn esp32:esp32:esp32s3 ./main.ino
+
+      - name: Upload artifact
+        uses: actions/upload‑artifact@v4
+        with:
+          name: firmware
+          path: ./build/esp32.esp32.esp32s3/main.bin
